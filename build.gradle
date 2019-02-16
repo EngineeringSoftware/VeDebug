@@ -1,0 +1,123 @@
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+
+    // Apply the application plugin to add support for building an application
+    id 'application'
+
+    // Plugin for building C executables
+    id 'c'
+}
+
+// Define the main class for the application
+mainClassName = 'test.C'
+if (project.hasProperty('main')) {
+    mainClassName = main
+}
+
+// Define arguments for the Java Agent
+def agentArgString = '-P=test/'
+if (project.hasProperty('agentArgs')) {
+    agentArgString = agentArgs
+}
+
+// Other application info
+applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
+executableDir = "/build/bin"
+
+dependencies {
+    // Use JUnit test framework
+    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
+}
+
+jar {
+    manifest {
+        attributes('Premain-Class': 'vedebug.core.VideoAgent',
+                'Can-Redefine-Classes': 'true',
+                'Can-Retransform-Classes': 'true',
+                'Can-Set-Native-Method-Prefix': 'true')
+    }
+}
+
+// Add agent.jar as an argument to the execution
+run.doFirst {
+    def cleared = new File('.vedebug').deleteDir()
+    assert cleared
+
+    if (agentArgString != null) {
+        jvmArgs "-javaagent:$libsDir/vedebug.jar=$agentArgString"
+    } else {
+        jvmArgs "-javaagent:$libsDir/vedebug.jar"
+    }
+}
+
+// Remove .vedebug when running clean task
+clean.doFirst {
+    def cleared = new File('.vedebug').deleteDir()
+    assert cleared
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            exclude '*.swp'
+        }
+    }
+}
+
+model {
+    toolChains {
+        gcc(Gcc)
+    }
+    components {
+        main(NativeExecutableSpec) {
+            sources {
+                c {
+                    source {
+                        exclude '*.swp'
+                    }
+                }
+            }
+            binaries {
+                all {
+                    if (toolChain in Gcc) {
+                        cCompiler.args "-std=gnu99"
+                        linker.args "-lncurses"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Add agent.jar as an argument to test
+test {
+    // if (agentArgString != null) {
+    //     jvmArgs "-javaagent:$libsDir/vedebug.jar=$agentArgString"
+    // } else {
+    //     jvmArgs "-javaagent:$libsDir/vedebug.jar"
+    // }
+
+    testLogging {
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+            }
+        }
+
+        // Forces tests to output to console
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+
+        // To fix gradle bugs with Java 11
+        targetCompatibility = '8'
+        sourceCompatibility = '8'
+    }
+}

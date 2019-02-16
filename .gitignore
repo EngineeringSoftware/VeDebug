@@ -1,0 +1,43 @@
+
+## Java
+*.class
+
+
+## Emacs
+*~
+\#*\#
+
+
+## Gradle
+.gradle/
+/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+
+## IDEA
+*.iml
+*.idea/
+out/
+
+
+## I/O files
+.vedebug*/
+maze.txt
+MethodCalls.txt
+data.txt
+objectHistories.txt
+
+
+## Misc
+*ASM.java
+*.sw*
+*.pyc
+*.out
