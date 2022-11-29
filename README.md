@@ -7,8 +7,8 @@ breakpoint" (which "breaks" the execution whenever the control flow of
 the current execution diverges from the flow of a previously captured
 execution), and (2) video debugging, which provides features similar
 to those of a video player (e.g., speed up/slow down the replay). The
-demo video for VeDebug can be found at: <https://www.youtube.com/
-watch?v=lOiGrE_sc10>.
+demo video for VeDebug can be found at:
+<https://www.youtube.com/watch?v=lOiGrE_sc10>.
 
 The screenshot shows VeDebug debugging environment: current statement
 and context (top-left), argument values and video status
